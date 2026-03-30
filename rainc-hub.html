@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAINC Strategy Hub</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500&family=DM+Serif+Display&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #f7f5f0;
+    --surface: #ffffff;
+    --surface2: #f2efe9;
+    --border: #e0dbd0;
+    --border2: #cdc8bc;
+    --text: #1a1814;
+    --text2: #5a5650;
+    --text3: #9a9590;
+    --gold: #b8902a;
+    --gold-bg: #fdf8ee;
+    --gold-border: #e8d49a;
+    --info: #1a5fa0;
+    --info-bg: #edf4fc;
+    --info-border: #b0d0f0;
+    --success: #1a6e3c;
+    --success-bg: #edf7f2;
+    --success-border: #a0d8b8;
+    --warn: #7a4d0a;
+    --warn-bg: #fef8ee;
+    --warn-border: #f0d898;
+    --danger: #8a1f1f;
+    --danger-bg: #fdf0f0;
+    --danger-border: #f0b8b8;
+    --navy: #0f1f3d;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+
+  html { font-size: 15px; }
+  body {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  /* Layout */
+  .page { max-width: 860px; margin: 0 auto; padding: 2.5rem 1.5rem 5rem; }
+
+  /* Header */
+  .hub-header {
+    border-bottom: 2px solid var(--gold);
+    padding-bottom: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  .hub-eyebrow {
+    font-size: 11px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+  .hub-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px;
+    color: var(--navy);
+    line-height: 1.2;
+    margin-bottom: 6px;
+  }
+  .hub-sub { font-size: 13px; color: var(--text2); }
+
+  /* Tabs */
+  .tab-bar {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+  .tab {
+    padding: 7px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    font-size: 13px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text2);
+    font-weight: 400;
+    transition: all .15s;
+    letter-spacing: 0.01em;
+  }
+  .tab:hover { background: var(--surface); color: var(--text); }
+  .tab.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+    font-weight: 500;
+  }
+
+  /* Section visibility */
+  .section { display: none; }
+  .section.active { display: block; }
+
+  /* Strategy cards */
+  .strat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .strat-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    user-select: none;
+    transition: background .15s;
+  }
+  .strat-card-header:hover { background: var(--surface2); }
+  .strat-card-title {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .badge {
+    font-size: 11px;
+    padding: 2px 9px;
+    border-radius: 20px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .badge-gold { background: var(--gold-bg); color: var(--gold); border: 1px solid var(--gold-border); }
+  .badge-green { background: var(--success-bg); color: var(--success); border: 1px solid var(--success-border); }
+  .badge-blue { background: var(--info-bg); color: var(--info); border: 1px solid var(--info-border); }
+  .badge-gray { background: var(--surface2); color: var(--text2); border: 1px solid var(--border); }
+  .chevron { font-size: 11px; color: var(--text3); transition: transform .2s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .strat-body {
+    display: none;
+    padding: 1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+    font-size: 13.5px;
+    line-height: 1.7;
+    color: var(--text2);
+  }
+  .strat-body.open { display: block; }
+  .strat-body p { margin-bottom: 0.6rem; }
+  .strat-body p:last-child { margin-bottom: 0; }
+  .strat-body strong { color: var(--text); font-weight: 500; }
+  .strat-body ul { padding-left: 1.3rem; margin: 4px 0 8px; }
+  .strat-body li { margin-bottom: 4px; }
+  .strat-body h5 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    font-weight: 500;
+    margin: 14px 0 6px;
+  }
+
+  .callout {
+    background: var(--gold-bg);
+    border-left: 3px solid var(--gold);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    padding: 10px 14px;
+    margin: 10px 0;
+    font-style: italic;
+    color: var(--text);
+    font-size: 13.5px;
+  }
+  .alert {
+    border-radius: var(--radius-sm);
+    padding: 9px 13px;
+    margin: 10px 0;
+    font-size: 13px;
+  }
+  .alert-warn { background: var(--warn-bg); border: 1px solid var(--warn-border); color: var(--warn); }
+  .alert-danger { background: var(--danger-bg); border: 1px solid var(--danger-border); color: var(--danger); }
+
+  .do-dont {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .do-col, .dont-col {
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+  }
+  .do-col { background: var(--success-bg); border: 1px solid var(--success-border); }
+  .dont-col { background: var(--danger-bg); border: 1px solid var(--danger-border); }
+  .col-label { font-weight: 500; font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 6px; }
+  .do-col .col-label { color: var(--success); }
+  .dont-col .col-label { color: var(--danger); }
+  .do-col li, .dont-col li { color: var(--text2); margin-bottom: 3px; padding-left: 0; }
+  .do-col ul, .dont-col ul { padding-left: 1rem; margin: 0; }
+
+  /* Team sections */
+  .team-section {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 10px;
+    overflow: hidden;
+  }
+  .team-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    background: var(--surface2);
+    user-select: none;
+    transition: background .15s;
+  }
+  .team-header:hover { background: #ebe7df; }
+  .team-title-row { display: flex; align-items: center; gap: 12px; }
+  .team-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: var(--radius-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    flex-shrink: 0;
+  }
+  .team-name { font-size: 14px; font-weight: 500; color: var(--text); }
+  .team-desc { font-size: 12px; color: var(--text3); margin-top: 1px; }
+  .team-body {
+    display: none;
+    padding: 1.1rem 1.25rem 1.25rem;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .team-body.open { display: block; }
+  .team-body p { font-size: 13.5px; color: var(--text2); line-height: 1.65; margin-bottom: 0.55rem; }
+  .team-body strong { color: var(--text); font-weight: 500; }
+  .team-body h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    font-weight: 500;
+    margin: 14px 0 6px;
+  }
+  .team-body ul { padding-left: 1.3rem; font-size: 13.5px; color: var(--text2); }
+  .team-body li { margin-bottom: 5px; line-height: 1.55; }
+
+  /* Tracker */
+  .progress-wrap { margin-bottom: 1.25rem; }
+  .progress-label { font-size: 12px; color: var(--text3); margin-bottom: 6px; }
+  .progress-bar {
+    height: 5px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--success);
+    border-radius: 3px;
+    transition: width .35s ease;
+  }
+
+  .filter-row { display: flex; gap: 6px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .filter-btn {
+    padding: 4px 12px;
+    border-radius: 20px;
+    border: 1px solid var(--border2);
+    font-size: 12px;
+    font-family: 'DM Sans', sans-serif;
+    cursor: pointer;
+    background: transparent;
+    color: var(--text2);
+    transition: all .15s;
+  }
+  .filter-btn:hover { background: var(--surface); }
+  .filter-btn.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+  }
+
+  .task-group { margin-bottom: 1.1rem; }
+  .task-group-label {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--text3);
+    font-weight: 500;
+    margin-bottom: 6px;
+    padding-left: 2px;
+  }
+  .task-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    transition: background .12s;
+  }
+  .task-item:hover { background: var(--surface2); }
+
+  .task-check {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    border: 1.5px solid var(--border2);
+    flex-shrink: 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    background: transparent;
+    transition: all .15s;
+    font-size: 10px;
+    font-weight: 600;
+  }
+  .task-check.done { background: var(--success-bg); border-color: var(--success); color: var(--success); }
+  .task-check.done::after { content: '✓'; }
+  .task-check.blocked { background: var(--danger-bg); border-color: var(--danger); color: var(--danger); }
+  .task-check.blocked::after { content: '!'; }
+  .task-check.progress { background: var(--warn-bg); border-color: #e8a020; }
+  .task-check.progress::after { content: '·'; font-size: 18px; color: #b87010; line-height: 0; margin-top: 1px; }
+
+  .task-content { flex: 1; min-width: 0; }
+  .task-text { font-size: 13.5px; color: var(--text); line-height: 1.4; }
+  .task-text.done-text { text-decoration: line-through; color: var(--text3); }
+  .task-meta { display: flex; gap: 5px; margin-top: 5px; flex-wrap: wrap; align-items: center; }
+  .task-tag {
+    font-size: 11px;
+    padding: 1px 8px;
+    border-radius: 20px;
+    border: 1px solid transparent;
+  }
+  .tag-jeff { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
+  .tag-writer { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+  .tag-fe { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
+  .tag-seo { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+  .tag-status {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text3);
+  }
+
+  /* Open questions */
+  .oq-item {
+    border: 1px solid var(--danger-border);
+    border-radius: var(--radius-sm);
+    padding: 11px 14px;
+    margin-bottom: 8px;
+    background: var(--danger-bg);
+  }
+  .oq-title { font-size: 13.5px; color: var(--text); font-weight: 500; margin-bottom: 4px; }
+  .oq-body { font-size: 13px; color: var(--text2); line-height: 1.55; }
+  .oq-owner { font-size: 11.5px; color: var(--danger); font-weight: 500; margin-top: 6px; }
+
+  /* Open questions table fallback */
+  .oq-table { width: 100%; border-collapse: collapse; font-size: 13px; margin-top: 4px; }
+  .oq-table th {
+    text-align: left;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--text3);
+    font-weight: 500;
+    padding: 6px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .oq-table td { padding: 9px 10px; border-bottom: 1px solid var(--border); color: var(--text2); vertical-align: top; }
+  .oq-table tr:last-child td { border-bottom: none; }
+  .oq-table tr:hover td { background: var(--surface2); }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 1.5rem 0; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="hub-header">
+    <div class="hub-eyebrow">Internal Strategy Hub — Confidential</div>
+    <div class="hub-title">Registered Agents Inc<br>Brand & Site Repositioning</div>
+    <div class="hub-sub" style="margin-top:8px;">Positioning direction, messaging framework, and team-specific briefs for all active workstreams</div>
+  </div>
+
+  <div class="tab-bar">
+    <button class="tab active" onclick="showTab('strategy',this)">Core Strategy</button>
+    <button class="tab" onclick="showTab('teams',this)">Team Briefs</button>
+    <button class="tab" onclick="showTab('tracker',this)">Next Steps Tracker</button>
+    <button class="tab" onclick="showTab('questions',this)">Open Questions</button>
+  </div>
+
+  <!-- ===== STRATEGY ===== -->
+  <div id="tab-strategy" class="section active">
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-gold">Foundation</span> The Core Metaphor</div>
+        <span class="chevron open">▾</span>
+      </div>
+      <div class="strat-body open">
+        <p><strong>Everything traces back to this one idea:</strong></p>
+        <div class="callout">"Think of RAINC as the more approachable ADP for business owners."</div>
+        <p>ADP is invisible infrastructure that serious businesses rely on. Nobody questions whether ADP is legitimate — it simply works. RAINC is that for business formation: the backbone behind American businesses, handling complexity so entrepreneurs can focus on building.</p>
+        <p>This reframes us from a sketchy registered agent to a <strong>business infrastructure provider.</strong> It is the lens through which every piece of copy, every page, and every media touchpoint should be evaluated.</p>
+      </div>
+    </div>
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-gold">Foundation</span> Positioning Statement</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="strat-body">
+        <div class="callout">RAINC is business formation infrastructure. We handle formation, compliance, and registered agent services so entrepreneurs can focus on building, not paperwork. We are not a transactional service or a legal shortcut. We are the reliable, affordable backbone that serious business owners depend on.</div>
+        <p><strong>Infrastructure, Not Endorsement:</strong> Like a phone company that provides service without endorsing every call, or a bank that processes transactions without guaranteeing every customer, we provide essential formation services to anyone starting a legitimate business. We take our legal responsibilities seriously: we verify identities, comply with all state and federal regulations, and maintain the highest standards of integrity in our industry.</p>
+        <p>We are infrastructure, not endorsement.</p>
+      </div>
+    </div>
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-green">Values</span> Core Values — Active 3 of 6</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="strat-body">
+        <p>Selected specifically to address the industry credibility problem. Every brand touchpoint should reinforce at least one.</p>
+        <ul>
+          <li><strong>Integrity</strong> — Reliable, trustworthy channel for legal correspondence. We verify identities, comply with all state and federal regulations, and take legal responsibilities seriously.</li>
+          <li><strong>Privacy</strong> — We never sell client data to third parties. We protect personal information and keep home addresses off public state records. Privacy is not a feature — it is a core value.</li>
+          <li><strong>Efficiency</strong> — Everything a business needs to launch is in one place. Formation to compliance to business identity — set up in minutes, not months.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-blue">Tone</span> Tone of Voice</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="strat-body">
+        <div class="do-dont">
+          <div class="do-col">
+            <div class="col-label">Write this way</div>
+            <ul>
+              <li>Confident, not defensive</li>
+              <li>Empowering, not transactional</li>
+              <li>Direct and clear</li>
+              <li>Mission-driven</li>
+              <li>Approachable, reliable</li>
+            </ul>
+          </div>
+          <div class="dont-col">
+            <div class="col-label">Never do this</div>
+            <ul>
+              <li>Apologetic or reactive</li>
+              <li>Overly legal / corporate</li>
+              <li>Partisan</li>
+              <li>Boastful without proof</li>
+              <li>Buried value propositions</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top:12px;">Lead with scale and authority, not explanations of what we are not. Every claim must be backed by a stat or concrete service detail.</p>
+      </div>
+    </div>
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-gold">Credibility</span> Why Trust Us — Approved Proof Points</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="strat-body">
+        <div class="alert alert-warn">⚠ Statistics marked with * need stakeholder confirmation before use in final copy.</div>
+        <h5>Scale & Experience</h5>
+        <ul>
+          <li>___ business formations filed annually *</li>
+          <li>More formations than any other provider in the US *</li>
+          <li>Over one million businesses currently supported *</li>
+          <li>Operating in all 50 states with locally staffed offices</li>
+          <li>Founded in 2008 — nearly two decades of formation expertise</li>
+        </ul>
+        <h5>Data Authority</h5>
+        <ul>
+          <li>Publisher of the monthly Business Formation Report</li>
+          <li>Most up-to-date formation data available in the country</li>
+          <li>State-by-state breakdown no other report provides</li>
+          <li>Cited by economists, journalists, and policymakers</li>
+          <li>Data drawn directly from Secretary of State filings nationwide</li>
+        </ul>
+        <h5>Infrastructure Mindset</h5>
+        <ul>
+          <li>One platform for formation, compliance, and business identity tools</li>
+          <li>Formation starts at $100 — a fraction of attorney costs</li>
+          <li>Domain, website, email, and phone included — operational in minutes</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="strat-card">
+      <div class="strat-card-header" onclick="toggleCard(this)">
+        <div class="strat-card-title"><span class="badge badge-gray">Analytics</span> Site Analytics Context</div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="strat-body">
+        <p><strong>The credibility gap in data:</strong> 44% direct entry, 41% referral, only 9% search. We depend heavily on people already knowing we exist. ADP doesn't need that.</p>
+        <ul>
+          <li>Affiliate pages drive huge volume but bounce hard — 0.42% conversion rate</li>
+          <li>Direct entry converts at 3.19% — people who know us convert at <strong>7.5× the rate</strong> of affiliate visitors</li>
+          <li>Social: highest conversion rate at 7.29% — small sample but worth understanding what's driving it</li>
+          <li>BFR page: 3,917 views, 1,319 direct entries — people are seeking it out. But 2,149 exits vs. 1,055 internal navigations — more than half are leaving. We should be converting them, not just building awareness.</li>
+          <li>"Registered agent" keyword: 117K impressions, rank 6, 1% CTR. Visible but not compelling — title tags aren't differentiating enough. Branded keywords pull 23–31% CTR at rank 1. The gap is massive.</li>
+        </ul>
+        <p>Almost every high-click keyword is a branded variation. We own the brand but not the category.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TEAMS ===== -->
+  <div id="tab-teams" class="section">
+
+    <div class="team-section">
+      <div class="team-header" onclick="toggleTeam(this)">
+        <div class="team-title-row">
+          <div class="team-icon" style="background:var(--info-bg);color:var(--info);">✍</div>
+          <div>
+            <div class="team-name">Writers / Content Team</div>
+            <div class="team-desc">Copy, messaging, and narrative</div>
+          </div>
+        </div>
+        <span class="chevron open">▾</span>
+      </div>
+      <div class="team-body open">
+        <p><strong>Your job:</strong> Write from the ADP positioning. Every page leads with infrastructure and authority — never with defensive explanations of what a registered agent is.</p>
+        <h4>Pages in scope</h4>
+        <p>Homepage, About, FAQ (general), Newsroom general, BFR page, Leadership bios</p>
+        <h4>About page structure</h4>
+        <p>Lead with origin story → who we are → core values (Integrity, Privacy, Efficiency) → why the BFR matters → Infrastructure Not Endorsement section → Why Trust Us proof points</p>
+        <div class="callout">Origin story framing: "What if there was infrastructure to handle all the complexity, so anyone with an idea could start a business?" — bring it home with the ADP positioning. We are infrastructure, not gatekeepers.</div>
+        <h4>FAQ approach</h4>
+        <p>Address confusion head-on without being defensive. Consider a "What we do and what we DON'T do" section. Frame from authority, not explanation. Topics: what is a registered agent, what are our services, how is RAINC different from a law firm.</p>
+        <h4>Leadership bios</h4>
+        <p>Bios should establish expertise over personal info. Writer can review for expertise-forward language once stakeholders confirm photo approach.</p>
+        <h4>⚠ Client success stories — do not proceed without this</h4>
+        <div class="alert alert-danger">Do not write testimonials or highlight specific businesses until stakeholders define vetting criteria. Risk: associating brand with a business that becomes controversial or is perceived as a bad actor.</div>
+      </div>
+    </div>
+
+    <div class="team-section">
+      <div class="team-header" onclick="toggleTeam(this)">
+        <div class="team-title-row">
+          <div class="team-icon" style="background:var(--warn-bg);color:var(--warn);">⚙</div>
+          <div>
+            <div class="team-name">Frontend / Dev Team</div>
+            <div class="team-desc">Site structure, builds, and nav</div>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="team-body">
+        <p><strong>Your job:</strong> Align site structure so the BFR is the center of gravity. The common user path is: someone reads the report → clicks around the site to judge credibility. Fix that credibility path first.</p>
+        <h4>Navigation updates</h4>
+        <ul>
+          <li>Add BFR to main nav (pending responsive/layout constraints)</li>
+          <li>Consider "Why RAINC" or "Our Story" instead of "About Us"</li>
+          <li>Confirm: keep Services dropdown, Partner With Us, Referral/Affiliate dropdowns as-is? (Stakeholder decision pending)</li>
+        </ul>
+        <h4>Newsroom restructure</h4>
+        <p>New category structure: Report Coverage | Industry Mentions | Data Insights | Policies & Bills. Reverse chronological order. Separate BFR section with full archive — <strong>this is a structural change, not a content swap.</strong> Add external press mentions once list is sourced.</p>
+        <h4>Page builds needed</h4>
+        <ul>
+          <li>About page with new structure (after writer delivers copy)</li>
+          <li>FAQ page + homepage snippet/teaser</li>
+          <li>Leadership page update with new photos + bios (blocked: pending photo decision)</li>
+          <li>BFR archive section</li>
+        </ul>
+        <h4>Homepage quick wins</h4>
+        <ul>
+          <li>Trust signals above the fold (500,000+ formations)</li>
+          <li>Larger BFR promo higher on page</li>
+          <li>"As seen in" press logos (pending list)</li>
+          <li>Homepage FAQ snippet pointing to full FAQ page</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="team-section">
+      <div class="team-header" onclick="toggleTeam(this)">
+        <div class="team-title-row">
+          <div class="team-icon" style="background:var(--danger-bg);color:var(--danger);">↗</div>
+          <div>
+            <div class="team-name">Paid / SEO / Social</div>
+            <div class="team-desc">Discovery, reach, and conversion</div>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="team-body">
+        <p><strong>Your job:</strong> We own branded keywords but not the category. The gap between how well we convert people who already know us vs. people discovering us for the first time is the core problem to solve.</p>
+        <h4>SEO priorities</h4>
+        <ul>
+          <li>Meta title + description audit across all key pages — rank 6 with 1% CTR means visible but not compelling</li>
+          <li>Add internal links + conversion hooks to BFR page — over half of visitors exit without going deeper</li>
+          <li>Expand keyword strategy to category-level: "registered agent service," "start an LLC," "business formation"</li>
+        </ul>
+        <h4>Paid campaigns</h4>
+        <p>Almost every top-converting keyword is a branded variation. Expand to category-level searches to build the ADP-for-business-owners reputation in search. Branded terms pull 23–31% CTR at rank 1 — replicate that with category terms.</p>
+        <h4>Social strategy direction</h4>
+        <ul>
+          <li>~40% — Report insights (monthly data, state trends, economic analysis)</li>
+          <li>~30% — Formation education (how to start a business by state, formation mistakes, compliance)</li>
+          <li>~20% — Industry commentary (policy changes, regulatory updates, economic trends)</li>
+          <li>~10% — Company milestones / humble brags (BFR coverage, data citations, infrastructure updates)</li>
+        </ul>
+        <div class="callout">Social has the highest conversion rate of any channel at 7.29% vs. 0.42% for affiliates. Small sample size — worth understanding which content is driving that before scaling spend.</div>
+        <p>Note: review full strategy with Carolyn &amp; Chantal before finalizing content calendar.</p>
+      </div>
+    </div>
+
+    <div class="team-section">
+      <div class="team-header" onclick="toggleTeam(this)">
+        <div class="team-title-row">
+          <div class="team-icon" style="background:var(--success-bg);color:var(--success);">◈</div>
+          <div>
+            <div class="team-name">Leadership / Stakeholders — Jeff &amp; Whitney</div>
+            <div class="team-desc">Decisions needed to unblock the team</div>
+          </div>
+        </div>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="team-body">
+        <p><strong>Your job:</strong> Several workstreams are blocked waiting on decisions. Each item needs written confirmation or a call before the associated work can proceed.</p>
+        <h4>Decisions needed</h4>
+        <div class="oq-item" style="margin-bottom:8px;">
+          <div class="oq-title">Credibility statistics</div>
+          <div class="oq-body">Confirm final numbers for: formations filed annually, "more formations than any other provider," "over one million businesses currently supported." Core proof points — cannot publish without confirmed sourcing.</div>
+          <div class="oq-owner">→ Jeff / Whitney</div>
+        </div>
+        <div class="oq-item" style="margin-bottom:8px;">
+          <div class="oq-title">About page / origin story direction</div>
+          <div class="oq-body">Is Whitney's RAINC Story doc a copy-paste for the About page, or can the writer adapt and build on it using the positioning direction in this hub?</div>
+          <div class="oq-owner">→ Jeff / Whitney</div>
+        </div>
+        <div class="oq-item" style="margin-bottom:8px;">
+          <div class="oq-title">Leadership photos</div>
+          <div class="oq-body">Real photos, AI portraits, or another approach? Who sources them? The current cartoon avatar presentation is a known credibility gap — especially for press and data audiences. Blocks the Leadership page build entirely.</div>
+          <div class="oq-owner">→ Jeff / Whitney</div>
+        </div>
+        <div class="oq-item" style="margin-bottom:0;">
+          <div class="oq-title">Client success story vetting criteria</div>
+          <div class="oq-body">Do we have existing client stories? What is the approval process before a business is highlighted in copy, case studies, or social? Must be defined before any testimonials are written.</div>
+          <div class="oq-owner">→ Stakeholders to define</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===== TRACKER ===== -->
+  <div id="tab-tracker" class="section">
+    <div class="progress-wrap">
+      <div class="progress-label" id="prog-label">0 of 22 complete</div>
+      <div class="progress-bar"><div class="progress-fill" id="prog-fill" style="width:0%"></div></div>
+    </div>
+    <div class="filter-row">
+      <button class="filter-btn active" onclick="filterTasks('all',this)">All</button>
+      <button class="filter-btn" onclick="filterTasks('jeff',this)">Jeff / Whitney</button>
+      <button class="filter-btn" onclick="filterTasks('writer',this)">Writer</button>
+      <button class="filter-btn" onclick="filterTasks('fe',this)">Frontend</button>
+      <button class="filter-btn" onclick="filterTasks('seo',this)">Paid / SEO / Social</button>
+    </div>
+    <div id="task-list"></div>
+  </div>
+
+  <!-- ===== OPEN QUESTIONS ===== -->
+  <div id="tab-questions" class="section">
+    <p style="font-size:13.5px;color:var(--text2);margin-bottom:1.25rem;line-height:1.65;">Unresolved items blocking execution. Each needs a decision from the right stakeholder before the associated workstream can move forward.</p>
+
+    <div class="oq-item">
+      <div class="oq-title">Approved statistics for credibility proof points</div>
+      <div class="oq-body">Formations filed annually, "largest provider" claim, "over one million businesses" — all currently on the RAINC site but need confirmed sourcing before use in new copy. Cannot publish without this.</div>
+      <div class="oq-owner">→ Jeff / Whitney to confirm or provide updated numbers</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">About page / origin story: copy-paste or rewrite?</div>
+      <div class="oq-body">Is Whitney's RAINC Story doc the final source for the About page, or can the writer adapt and build on it using the positioning direction in this hub?</div>
+      <div class="oq-owner">→ Jeff / Whitney to clarify scope for writer</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">Leadership photos decision</div>
+      <div class="oq-body">Real photos, AI portraits, or another approach? Who is responsible for sourcing? The current cartoon avatar presentation is a known credibility gap — especially for press and data audiences. This blocks the Leadership page build entirely.</div>
+      <div class="oq-owner">→ Jeff / Whitney to decide and assign sourcing responsibility</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">Client success story / testimonial vetting criteria</div>
+      <div class="oq-body">Do we have existing client stories? What is the approval process for highlighting a business in copy, case studies, or on social? Risk: associating brand with a business that becomes controversial.</div>
+      <div class="oq-owner">→ Stakeholders to define criteria before any copy is written</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">Navigation label confirmation</div>
+      <div class="oq-body">Keep "Services" tab with dropdown? Keep "Partner With Us" + Referral/Affiliate dropdowns as-is? Keep all current pages under About Us (minus BFR)? Rename "About Us" to "Why RAINC" or "Our Story"?</div>
+      <div class="oq-owner">→ Jeff / Whitney to confirm nav structure before FE builds</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">External press mentions list</div>
+      <div class="oq-body">Do we have a list, or does Brittany source and categorize? Blocks the Newsroom rebuild and "As Seen In" homepage section.</div>
+      <div class="oq-owner">→ Brittany can sort into categories once list is provided or sourced</div>
+    </div>
+    <div class="oq-item">
+      <div class="oq-title">What public credibility proof can be shown?</div>
+      <div class="oq-body">Logos, customer examples, scale statements — what can be shown publicly vs. what needs to remain subtle or indirect? Directly impacts homepage and About page decisions.</div>
+      <div class="oq-owner">→ Jeff / Whitney + legal/stakeholder review</div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const tasks = [
+  {id:1,text:'Confirm approved credibility statistics (formations filed, businesses supported)',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:2,text:'Clarify if RAINC Story doc is copy-paste or writer can adapt',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:3,text:'Leadership photo decision + sourcing assignment',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:4,text:'Define client success story vetting criteria',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:5,text:'Confirm navigation labels (Services, Partner With Us, About Us rename)',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:6,text:'Provide or source external press mentions list',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:7,text:'Define what public credibility proof can be shown vs. kept indirect',team:'jeff',status:'todo',group:'Stakeholder Decisions'},
+  {id:8,text:'Homepage copy',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:9,text:'About page copy (pending origin story direction from stakeholders)',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:10,text:'FAQ (general) copy',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:11,text:'Newsroom general page copy',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:12,text:'NEW PAGE: BFR page copy',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:13,text:'Leadership bios (expertise-forward language)',team:'writer',status:'todo',group:'Writer Copy'},
+  {id:14,text:'Add BFR to main nav',team:'fe',status:'todo',group:'Frontend Builds'},
+  {id:15,text:'Restructure newsroom with category sections + BFR archive',team:'fe',status:'todo',group:'Frontend Builds'},
+  {id:16,text:'Build About page with new structure (after writer copy)',team:'fe',status:'todo',group:'Frontend Builds'},
+  {id:17,text:'Build FAQ page + homepage snippet',team:'fe',status:'todo',group:'Frontend Builds'},
+  {id:18,text:'Update Leadership page with new photos + bios',team:'fe',status:'todo',group:'Frontend Builds'},
+  {id:19,text:'Meta title + description audit across all key pages',team:'seo',status:'todo',group:'Paid / SEO / Social'},
+  {id:20,text:'Add internal links + conversion hooks to BFR page',team:'seo',status:'todo',group:'Paid / SEO / Social'},
+  {id:21,text:'Expand paid + organic keyword strategy beyond branded terms',team:'seo',status:'todo',group:'Paid / SEO / Social'},
+  {id:22,text:'Review social strategy with Carolyn & Chantal + build content calendar',team:'seo',status:'todo',group:'Paid / SEO / Social'},
+];
+
+const teamLabels = {jeff:'Jeff/Whitney',writer:'Writer',fe:'Frontend',seo:'SEO/Social'};
+const statusLabels = {todo:'To do',progress:'In progress',blocked:'Blocked',done:'Done'};
+let currentFilter = 'all';
+
+function renderTasks(){
+  const filtered = currentFilter==='all' ? tasks : tasks.filter(t=>t.team===currentFilter);
+  const groups = [...new Set(filtered.map(t=>t.group))];
+  document.getElementById('task-list').innerHTML = groups.map(g=>{
+    const gt = filtered.filter(t=>t.group===g);
+    return `<div class="task-group">
+      <div class="task-group-label">${g}</div>
+      ${gt.map(t=>`
+        <div class="task-item">
+          <div class="task-check ${t.status}" onclick="cycle(${t.id})" title="Click to cycle status"></div>
+          <div class="task-content">
+            <div class="task-text ${t.status==='done'?'done-text':''}">${t.text}</div>
+            <div class="task-meta">
+              <span class="task-tag tag-${t.team}">${teamLabels[t.team]}</span>
+              <span class="task-tag tag-status">${statusLabels[t.status]}</span>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>`;
+  }).join('');
+  updateProgress();
+}
+
+function cycle(id){
+  const t=tasks.find(t=>t.id===id);
+  const order=['todo','progress','blocked','done'];
+  t.status=order[(order.indexOf(t.status)+1)%order.length];
+  renderTasks();
+}
+
+function updateProgress(){
+  const done=tasks.filter(t=>t.status==='done').length;
+  document.getElementById('prog-fill').style.width=(done/tasks.length*100)+'%';
+  document.getElementById('prog-label').textContent=`${done} of ${tasks.length} complete`;
+}
+
+function filterTasks(team,btn){
+  currentFilter=team;
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderTasks();
+}
+
+function showTab(name,btn){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+name).classList.add('active');
+  btn.classList.add('active');
+}
+
+function toggleCard(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+function toggleTeam(header){
+  const body=header.nextElementSibling;
+  const chev=header.querySelector('.chevron');
+  body.classList.toggle('open');
+  chev.classList.toggle('open');
+}
+
+renderTasks();
+</script>
+</body>
+</html>
